@@ -2,7 +2,7 @@ import express, { Request, Response} from 'express'
 import { PrismaClient } from '@prisma/client';
 
 const app = express()
-app.use(express.json)
+app.use(express.json())
 
 const prisma = new PrismaClient()
 
@@ -22,6 +22,16 @@ app.get("/", async (req: Request, res: Response) => {
     res.json(users)
 });
 
+app.get("/byId/:id", async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const user = await prisma.user.findUnique({
+        where: {
+            id: Number(id),
+        } 
+    }) 
+    res.json(user)
+});
+
 app.put("/", async (req: Request, res: Response) => {
     const {id, username} = req.body
     const updateUser = await prisma.user.update({
@@ -36,7 +46,7 @@ app.put("/", async (req: Request, res: Response) => {
     res.json(updateUser)
 });
 
-app.delete("/", async (req: Request, res: Response) => {
+app.delete("/:id", async (req: Request, res: Response) => {
     const id = req.params.id
     const deletedUser = await prisma.user.delete({
         where: {
